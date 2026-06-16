@@ -7,6 +7,8 @@ from src.cointegration import find_cointegrated_pairs
 from src.pair_selector import select_pairs, calculate_spread
 from src.signals import generate_signals
 from src.backtest import run_backtest
+from src.metrics import sharpe_ratio, max_drawdown, calmar_ratio
+
 
 
 filename = "stock_prices.csv"
@@ -25,3 +27,9 @@ print(signals.value_counts())
 cumulative_pnl = run_backtest(spread, signals)
 print(cumulative_pnl.tail())
 print(f"Total PnL: {cumulative_pnl.iloc[-1]:.2f}")
+
+
+returns = cumulative_pnl.diff().dropna()
+print(f"Sharpe Ratio: {sharpe_ratio(returns):.2f}")
+print(f"Max Drawdown: {max_drawdown(cumulative_pnl):.2f}")
+print(f"Calmar Ratio: {calmar_ratio(returns, cumulative_pnl):.2f}")
