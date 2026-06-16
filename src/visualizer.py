@@ -42,4 +42,5 @@ def plot_results(spread, z_score, signals, cumulative_pnl, pair_name):
 
     plt.tight_layout()
     plt.show()
+    return fig
 
