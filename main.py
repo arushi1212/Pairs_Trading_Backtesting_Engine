@@ -8,6 +8,7 @@ from src.pair_selector import select_pairs, calculate_spread
 from src.signals import generate_signals
 from src.backtest import run_backtest
 from src.metrics import sharpe_ratio, max_drawdown, calmar_ratio
+from src.visualizer import plot_results
 
 
 
@@ -33,3 +34,6 @@ returns = cumulative_pnl.diff().dropna()
 print(f"Sharpe Ratio: {sharpe_ratio(returns):.2f}")
 print(f"Max Drawdown: {max_drawdown(cumulative_pnl):.2f}")
 print(f"Calmar Ratio: {calmar_ratio(returns, cumulative_pnl):.2f}")
+
+
+plot_results(spread, z_score, signals, cumulative_pnl, "GS/WFC")
