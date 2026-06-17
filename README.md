@@ -12,9 +12,9 @@ The pipeline runs in five stages:
 
 1. Data acquisition: download adjusted close prices for 10 large-cap financial tickers (2020-2024) via yfinance, cached locally as CSV.
 
-2. Pair discovery: test all 45 possible pairs for cointegration using Engle-Granger method: regress stock A on stock B, then run an Augmented Dickey-Fuller (ADF) test on the regression residuals. A pair is considered conintegrated if the residuals are stationary (p < 0.05).
+2. Pair discovery: test all 45 possible pairs for cointegration using Engle-Granger method: regress stock A on stock B, then run an Augmented Dickey-Fuller (ADF) test on the regression residuals. A pair is considered cointegrated if the residuals are stationary (p < 0.05).
 
-3. Pair selection: rank cointegrated pairs by p-value and filter by half-life of mean reversion (kept between 5 and 126 trading days, i.e., tradeable but not noise). THe top 5 pairs are selected for backtesting.
+3. Pair selection: rank cointegrated pairs by p-value and filter by half-life of mean reversion (kept between 5 and 126 trading days, i.e., tradeable but not noise). Tee top 5 pairs are selected for backtesting.
 
 4. Signal generation: compute the spread using the OLS hedge ratio, then a rolling z-score of that spread. Enter long/short at |z| > 2, exit at |z| < 0.5.
 
@@ -56,15 +56,19 @@ The strongest pair by statistical significance was GS/WFC, with cointegration p-
 |Total PnL| -26.58|
 |Sharpe Ratio| -0.11|
 |Max Drawdown| -87.86|
-|Calmar Ration| -0.06|
+|Calmar Ratio| -0.06|
 
 The figure below illustrates cumulative PnL, drawdown, and z-score based trading signals for the GS/WFC pair.
+![Alt Text](images/Figure_1.png)
 
+Although the pair exhibited strong statistical evidence of cointegration, the resulting strategy generated negative risk-adjusted returns. This highlights that a statistically significant relationship does not necessarily translate into an economically profitable trading strategy once realistic execution assumptions and transaction costs are considered, particularly given the full-sample selection bias discussed below.
 
-## **Lookahead Bias & Walk*Forward Validation**
+The results suggest that additional robustness measures, such as walk-forward validation, would be necessary before deploying the strategy in a live trading environment.
+
+## **Lookahead Bias & Walk-Forward Validation**
 Lookahead bias occurs when a backtest uses information that would not actually have been available at the time a trading decision was made. It produces unrealistically optimistic performance, since the strategy is effectively trading with knowledge of the future.
 
-**Where is could occur in this project, and how it was handled:**
+**Where it could occur in this project, and how it was handled:**
 1. Signal-to-trade timing: Trading signals are generated using yesterday's signal applied to today's price change (signal.shift(1)), not today's signal applied to today's return. In live trading, a signal observed at today's close can only be acted on starting the next trading session — using same-day signal and return would assume an impossible instantaneous execution.
 
 2. Z-score normalization: The rolling mean and standard deviation used to compute the z-score are calculated using only a trailing window (sized to the pair's half-life), not the full 5-year sample. Using the full-sample mean/std would mean a trade made in 2020 is implicitly informed by price data from 2024 — information that didn't exist yet.
@@ -75,6 +79,5 @@ Lookahead bias occurs when a backtest uses information that would not actually h
 
 ## **Tech Stack**
 Python, pandas, NumPy, statsmodels (ADF test, OLS regression), yfinance, Streamlit, Matplotlib
-**
 
 
